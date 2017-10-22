@@ -1,0 +1,76 @@
+In this implementation we transform a path expression into appropriate P and V
+operations for use in the prologue and epilogue of each procedure defined in
+the path expression. A recursive algorithm traverses the path expression,
+executing repeated transformations for providing the prologue and epilogue. At
+each stage of transformation a path expression yet to be translated will be
+labelled as <pe>. Each <pe> will be surrounded by two generated operations Ol
+and Or present on the left and right respectively. The operations that appear
+are P, V, PP, VV. P and V are the standard semaphore wait and signal operations.
+PP and VV are a combination of mutex and semaphore operations designed for
+allowing concurrent operations.
+
+Algorithm:
+
+Step 1 -
+  Replace path <pe> end by P(S1) <pe> V(S1)
+  where S1 is a unique semaphore initialized to 1.
+
+Step 2 -
+  Examine the path expression and depending on the synchronization scheme
+  perform the respective operation
+
+  a. Sequence -
+     Replace <pe1> ; <pe2> by by <pe1> V(S2) P(S2) <pe2>
+     where S2 is a unique semaphore initialized to 0.
+
+  b. Selection -
+     Replace Ol <pe1> + <pe2> Or by Ol <pe1> Or Ol <pe2> Or
+     where Ol is the operation to the left of <pe1>
+           Or is the operation to the right of <pe2>.
+
+  c. Concurrent -
+     Replace P(Si) { <pe> } V(Sj) by PP(C1, S3, Si) <pe> VV(C1, S3, Sj)
+     where P(Si) is the operation to the left of { <pe> }
+           V(Sj) is the operation to the right of { <pe> }
+           C1 is a unique counter initialized to 0
+           S3 is a unique semaphore initialized to 1.
+
+  d. Procedure -
+     When you reach a procedure name, the operation Ol (either a P or PP) is
+     the prologue for the procedure, the operation Or (either a V or VV) is
+     the epilogue for the procedure.
+
+The PP and VV operations are used to implement concurrent operations. Each
+share a counter C1 and a semaphore S3. The semaphore S3 acts as lock for
+while incrementing or decrementing the counter. The PP operation increments the
+counter and the VV operation decrements.
+If the counter is incremented from 0 to 1 then P(Si) is executed. If the counter
+is decreased from 1 to 0 the V(Sj) is executed.
+
+Examples-
+
+a.  path {read} + write end
+ -> P(S1) {read} + write V(S1)
+ -> P(S1) {read} V(S1) P(S1) write V(S1)
+ -> P(C1, S2, S1) read V(C1, S2, S1) P(S1) write V(S1)
+
+b.  path append ; remove end
+ -> P(S1) append ; remove V(S1)
+ -> P(S1) append V(S2) P(S2) remove V(S1)
+
+What happens when -
+
+1. INIT_SYNCHRONIZER is called?
+   The algorithm parses the path expression, then traverses it to generate
+   prologue and epilogue pairs for each procedures present in the path
+   expression.
+
+2. ENTER_OPERATION or EXIT_OPERATION is called?
+   The algorithm locates the prologue or epilogue for the passed procudere. The
+   prologue is stored contains -
+        a. name of procedure
+        b. type of operation
+        c. Index for counter
+        d. Index for semaphore 1
+        e. Index for semaphore 2
+   For P and V operations (c) and (e) are set to -1.

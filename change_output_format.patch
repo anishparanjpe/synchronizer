@@ -1,0 +1,39 @@
+diff --git a/child_care.c b/child_care.c
+index 241a541..a5da56a 100644
+--- a/child_care.c
++++ b/child_care.c
+@@ -54,7 +54,7 @@ void* _handle_thread(void *arg)
+   }
+ 
+   // Stats for verification
+-  printf("%s Thread %d Entry %lld.%ld Start %lld.%ld End %lld.%ld\n", 
++  printf("%s Thread %d Entry %lld.%09ld Start %lld.%09ld End %lld.%09ld\n", 
+       myinfo->op_name, myinfo->tid, 
+       (long long)myinfo->arrival_time.tv_sec-global_clock.tv_sec, myinfo->arrival_time.tv_nsec-global_clock.tv_nsec, 
+       (long long)myinfo->cs_enter_time.tv_sec-global_clock.tv_sec, myinfo->cs_enter_time.tv_nsec-global_clock.tv_nsec,
+diff --git a/one_slot_buffer.c b/one_slot_buffer.c
+index eb3691b..c9540bf 100644
+--- a/one_slot_buffer.c
++++ b/one_slot_buffer.c
+@@ -42,7 +42,7 @@ void* _handle_thread(void *arg)
+   }
+ 
+   // Stats for verification (Thread Start Time, Operation Start Time, Operation End Time)
+-  printf("%s Thread %d Entry %lld.%ld Start %lld.%ld End %lld.%ld\n", 
++  printf("%s Thread %d Entry %lld.%09ld Start %lld.%09ld End %lld.%09ld\n", 
+       myinfo->op_name, myinfo->tid, 
+       (long long)myinfo->arrival_time.tv_sec-global_clock.tv_sec, myinfo->arrival_time.tv_nsec-global_clock.tv_nsec,
+       (long long)myinfo->cs_enter_time.tv_sec-global_clock.tv_sec, myinfo->cs_enter_time.tv_nsec-global_clock.tv_nsec,
+diff --git a/readers_writers.c b/readers_writers.c
+index 387e69a..2146a85 100644
+--- a/readers_writers.c
++++ b/readers_writers.c
+@@ -45,7 +45,7 @@ void* _handle_thread(void *arg)
+   }
+ 
+   // Stats for verification (Thread Entry time, Operation Start Time, Operation End Time)
+-  printf("%s Thread %d Entry %lld.%ld Start %lld.%ld End %lld.%ld\n", 
++  printf("%s Thread %d Entry %lld.%09ld Start %lld.%09ld End %lld.%09ld\n", 
+       myinfo->op_name, myinfo->tid, 
+       (long long)myinfo->arrival_time.tv_sec-global_clock.tv_sec, myinfo->arrival_time.tv_nsec-global_clock.tv_nsec,
+       (long long)myinfo->cs_enter_time.tv_sec-global_clock.tv_sec, myinfo->cs_enter_time.tv_nsec-global_clock.tv_nsec,
